@@ -12,13 +12,9 @@ from .invoices import InvoiceBook
 def create_app(config_path: str = "config.yml") -> Flask:
     app = Flask(__name__)
     app.config["BILLING_CONFIG_PATH"] = config_path
-    app.config["BILLING"] = {}
+    with open(config_path) as f:
+        app.config["BILLING"] = yaml.safe_load(f)
     book = InvoiceBook()
-
-    @app.before_first_request
-    def load_billing_config():
-        with open(current_app.config["BILLING_CONFIG_PATH"]) as f:
-            current_app.config["BILLING"] = yaml.load(f)
 
     @app.post("/invoices")
     def create_invoice():
